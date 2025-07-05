@@ -3,6 +3,11 @@ name: Vault Secret Retrieval
 on:
   workflow_dispatch:
 
+# Required for OIDC authentication
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   retrieve-secret:
     runs-on: ubuntu-latest
@@ -12,7 +17,8 @@ jobs:
         id: vault
         with:
           url: ${{ secrets.VAULT_ADDR }}
-          token: ${{ secrets.VAULT_TOKEN }}
+          method: jwt
+          role: myproject-github-role  # This should match your Vault role name
           tlsSkipVerify: true
           secrets: |
             kv-v2/data/myapp username
