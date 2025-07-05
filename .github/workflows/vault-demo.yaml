@@ -27,11 +27,15 @@ jobs:
   retrieve-secret:
     runs-on: ubuntu-latest
     steps:
-      - name: Create Custom OIDC Claim
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Construct repo_with_env claim
+        id: custom_claim
         uses: ambilykk/actions-custom-oidc-claim@main
         with:
-          repo_with_env: ${{ github.repository }}-${{ github.event.inputs.env }}
-          
+          claim-name: repo_with_env
+          claim-value: ${{ github.repository }}-${{ github.event.inputs.env }}
       - name: Get Vault Secret
         uses: hashicorp/vault-action@v2
         id: vault

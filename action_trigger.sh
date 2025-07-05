@@ -13,18 +13,19 @@ NC='\033[0m' # No Color
 
 # Function to display usage
 usage() {
-    echo -e "${YELLOW}Usage: $0 [-a VAULT_URL] [-r ROLE_NAME] [-h]${NC}"
+    echo -e "${YELLOW}Usage: $0 [-a VAULT_URL] [-r ROLE_NAME] [-e ENVIRONMENT] [-h]${NC}"
     echo -e "${YELLOW}Options:${NC}"
     echo -e "${YELLOW}  -a VAULT_URL    Specify Vault server URL${NC}"
     echo -e "${YELLOW}  -r ROLE_NAME    Specify Vault role name${NC}"
+    echo -e "${YELLOW}  -e ENVIRONMENT  Specify environment (dev, staging, production)${NC}"
     echo -e "${YELLOW}  -h              Show this help message${NC}"
     echo -e "${YELLOW}${NC}"
     echo -e "${YELLOW}Environment Variables:${NC}"
     echo -e "${YELLOW}  VAULT_ADDR      Vault server URL (takes precedence over -a flag)${NC}"
     echo -e "${YELLOW}${NC}"
     echo -e "${YELLOW}Examples:${NC}"
-    echo -e "${YELLOW}  $0 -a https://vault.example.com:8200 -r myproject-github-role${NC}"
-    echo -e "${YELLOW}  VAULT_ADDR=https://vault.example.com:8200 $0 -r production-role${NC}"
+    echo -e "${YELLOW}  $0 -a https://vault.example.com:8200 -r myproject-github-role -e production${NC}"
+    echo -e "${YELLOW}  VAULT_ADDR=https://vault.example.com:8200 $0 -r production-role -e dev${NC}"
 }
 
 echo -e "${YELLOW}🚀 Triggering Vault Demo GitHub Action...${NC}"
@@ -46,13 +47,17 @@ fi
 # Parse command line options
 VAULT_ADDR_FLAG=""
 ROLE_NAME_FLAG=""
-while getopts "a:r:h" opt; do
+ENVIRONMENT_FLAG=""
+while getopts "a:r:e:h" opt; do
     case $opt in
         a)
             VAULT_ADDR_FLAG="$OPTARG"
             ;;
         r)
             ROLE_NAME_FLAG="$OPTARG"
+            ;;
+        e)
+            ENVIRONMENT_FLAG="$OPTARG"
             ;;
         h)
             usage
@@ -96,6 +101,17 @@ else
     exit 1
 fi
 
+# Get ENVIRONMENT from command line argument (required)
+ENVIRONMENT_INPUT=""
+if [ ! -z "$ENVIRONMENT_FLAG" ]; then
+    echo -e "${GREEN}🌍 Using environment: $ENVIRONMENT_FLAG${NC}"
+    ENVIRONMENT_INPUT="$ENVIRONMENT_FLAG"
+else
+    echo -e "${RED}❌ Environment not provided. Please use -e flag to specify the environment.${NC}"
+    usage
+    exit 1
+fi
+
 # Validate URL format (basic check)
 if [[ ! "$VAULT_ADDR_INPUT" =~ ^https?:// ]]; then
     echo -e "${RED}❌ Invalid URL format. Please provide a valid HTTP/HTTPS URL.${NC}"
@@ -103,11 +119,12 @@ if [[ ! "$VAULT_ADDR_INPUT" =~ ^https?:// ]]; then
     exit 1
 fi
 
-# Trigger the workflow with VAULT_ADDR and ROLE_NAME inputs
+# Trigger the workflow with VAULT_ADDR, ROLE_NAME, and ENVIRONMENT inputs
 echo -e "${YELLOW}Triggering workflow with:${NC}"
 echo -e "${YELLOW}  VAULT_ADDR: $VAULT_ADDR_INPUT${NC}"
 echo -e "${YELLOW}  ROLE_NAME: $ROLE_NAME_INPUT${NC}"
-if gh workflow run vault-demo.yaml --field vault_addr="$VAULT_ADDR_INPUT" --field role_name="$ROLE_NAME_INPUT"; then
+echo -e "${YELLOW}  ENVIRONMENT: $ENVIRONMENT_INPUT${NC}"
+if gh workflow run vault-demo.yaml --field vault_addr="$VAULT_ADDR_INPUT" --field role_name="$ROLE_NAME_INPUT" --field env="$ENVIRONMENT_INPUT"; then
     echo -e "${GREEN}✅ Workflow triggered successfully!${NC}"
     
     # Wait for the run to appear
