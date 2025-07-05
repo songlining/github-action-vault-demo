@@ -14,11 +14,10 @@ path "kv-v2/data/myapp" {
 }
 EOF
 
-# 4. Create a role that binds to your GitHub repository
 vault write auth/jwt/role/myproject-github-role -<<EOF
 {
   "role_type": "jwt",
-  "user_claim": "repository",
+  "user_claim": "repo_with_env",
   "bound_audiences": ["https://github.com/songlining/github-action-vault-demo"],
   "bound_claims": {
     "repository": "songlining/github-action-vault-demo"
