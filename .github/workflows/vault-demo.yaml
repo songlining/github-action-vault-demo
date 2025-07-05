@@ -12,6 +12,11 @@ on:
         required: true
         type: string
         default: 'myproject-github-role'
+      env:
+        description: 'Environment'
+        required: true
+        type: string
+        default: 'dev'
 
 # Required for OIDC authentication
 permissions:
@@ -22,6 +27,11 @@ jobs:
   retrieve-secret:
     runs-on: ubuntu-latest
     steps:
+      - name: Create Custom OIDC Claim
+        uses: ambilykk/actions-custom-oidc-claim@main
+        with:
+          repo_with_env: ${{ github.repository }}-${{ github.event.inputs.env }}
+          
       - name: Get Vault Secret
         uses: hashicorp/vault-action@v2
         id: vault
