@@ -13,6 +13,7 @@ jobs:
         with:
           url: ${{ secrets.VAULT_ADDR }}
           token: ${{ secrets.VAULT_TOKEN }}
+          tlsSkipVerify: true
           secrets: |
             kv-v2/data/myapp username
 
