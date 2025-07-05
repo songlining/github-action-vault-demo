@@ -34,8 +34,8 @@ jobs:
         id: custom_claim
         uses: ambilykk/actions-custom-oidc-claim@main
         with:
-          claim-name: repo_with_env
-          claim-value: ${{ github.repository }}-${{ github.event.inputs.env }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          claim-keys: repo,job_workflow_ref
       - name: Get Vault Secret
         uses: hashicorp/vault-action@v2
         id: vault

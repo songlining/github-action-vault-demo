@@ -17,7 +17,7 @@ EOF
 vault write auth/jwt/role/myproject-github-role -<<EOF
 {
   "role_type": "jwt",
-  "user_claim": "repo_with_env",
+  "user_claim": "sub",
   "bound_audiences": ["https://github.com/songlining/github-action-vault-demo"],
   "bound_claims": {
     "repository": "songlining/github-action-vault-demo"
