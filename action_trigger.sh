@@ -42,36 +42,12 @@ if gh workflow run vault-demo.yaml; then
     if [ ! -z "$LATEST_RUN_ID" ]; then
         echo -e "${GREEN}🔗 Run ID: ${LATEST_RUN_ID}${NC}"
         
-        # Ask user what they want to do
-        echo -e "${YELLOW}Choose an option:${NC}"
-        echo "1) Watch logs in real-time"
-        echo "2) View logs once"
-        echo "3) Just show run URL"
-        echo "4) Exit"
-        read -p "Enter choice (1-4): " choice
-        
-        case $choice in
-            1)
-                echo -e "${YELLOW}Watching logs in real-time...${NC}"
-                gh run watch "$LATEST_RUN_ID"
-                ;;
-            2)
-                echo -e "${YELLOW}Fetching logs...${NC}"
-                gh run view "$LATEST_RUN_ID" --log
-                ;;
-            3)
-                REPO_INFO=$(gh repo view --json owner,name)
-                OWNER=$(echo "$REPO_INFO" | jq -r '.owner.login')
-                REPO=$(echo "$REPO_INFO" | jq -r '.name')
-                echo -e "${GREEN}🔗 View at: https://github.com/${OWNER}/${REPO}/actions/runs/${LATEST_RUN_ID}${NC}"
-                ;;
-            4)
-                echo -e "${GREEN}Exiting...${NC}"
-                ;;
-            *)
-                echo -e "${RED}Invalid choice${NC}"
-                ;;
-        esac
+        # Wait for the workflow run to complete
+        echo -e "${YELLOW}Waiting for workflow run to complete...${NC}"
+        gh run watch "$LATEST_RUN_ID" --exit-status
+
+        echo -e "${YELLOW}Fetching logs...${NC}"
+        gh run view "$LATEST_RUN_ID" --log
     fi
 else
     echo -e "${RED}❌ Failed to trigger workflow${NC}"
