@@ -27,15 +27,6 @@ jobs:
   retrieve-secret:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Construct repo_with_env claim
-        id: custom_claim
-        uses: ambilykk/actions-custom-oidc-claim@main
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          claim-keys: repo,job_workflow_ref
       - name: Get Vault Secret
         uses: hashicorp/vault-action@v2
         id: vault
@@ -43,7 +34,7 @@ jobs:
           url: ${{ github.event.inputs.vault_addr }}
           method: jwt
           role: ${{ github.event.inputs.role_name }}
-          jwtGithubAudience: https://github.com/${{ github.repository }}
+          jwtGithubAudience: https://github.com/${{ github.repository }}:${{ github.event.inputs.env }}
           tlsSkipVerify: true
           secrets: |
             kv-v2/data/myapp username
