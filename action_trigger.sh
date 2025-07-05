@@ -27,9 +27,31 @@ if ! gh auth status &> /dev/null; then
     exit 1
 fi
 
-# Trigger the workflow
-echo -e "${YELLOW}Triggering workflow...${NC}"
-if gh workflow run vault-demo.yaml; then
+# Get VAULT_ADDR from environment variable or command line argument
+VAULT_ADDR_INPUT=""
+if [ ! -z "$VAULT_ADDR" ]; then
+    echo -e "${GREEN}📍 Using VAULT_ADDR from environment variable: $VAULT_ADDR${NC}"
+    VAULT_ADDR_INPUT="$VAULT_ADDR"
+elif [ ! -z "$1" ]; then
+    echo -e "${GREEN}📍 Using VAULT_ADDR from command line argument: $1${NC}"
+    VAULT_ADDR_INPUT="$1"
+else
+    echo -e "${RED}❌ VAULT_ADDR not found in environment variable and no command line argument provided.${NC}"
+    echo -e "${YELLOW}Usage: $0 [VAULT_URL]${NC}"
+    echo -e "${YELLOW}Or set VAULT_ADDR environment variable${NC}"
+    exit 1
+fi
+
+# Validate URL format (basic check)
+if [[ ! "$VAULT_ADDR_INPUT" =~ ^https?:// ]]; then
+    echo -e "${RED}❌ Invalid URL format. Please provide a valid HTTP/HTTPS URL.${NC}"
+    echo -e "${YELLOW}Example: https://vault.example.com:8200${NC}"
+    exit 1
+fi
+
+# Trigger the workflow with VAULT_ADDR input
+echo -e "${YELLOW}Triggering workflow with VAULT_ADDR: $VAULT_ADDR_INPUT${NC}"
+if gh workflow run vault-demo.yaml --field vault_addr="$VAULT_ADDR_INPUT"; then
     echo -e "${GREEN}✅ Workflow triggered successfully!${NC}"
     
     # Wait for the run to appear

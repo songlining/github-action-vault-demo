@@ -2,6 +2,11 @@ name: Vault Secret Retrieval
 
 on:
   workflow_dispatch:
+    inputs:
+      vault_addr:
+        description: 'Vault server URL'
+        required: true
+        type: string
 
 # Required for OIDC authentication
 permissions:
@@ -16,7 +21,7 @@ jobs:
         uses: hashicorp/vault-action@v2
         id: vault
         with:
-          url: ${{ secrets.VAULT_ADDR }}
+          url: ${{ github.event.inputs.vault_addr }}
           method: jwt
           role: myproject-github-role
           jwtGithubAudience: https://github.com/songlining/github-action-vault-demo
