@@ -7,6 +7,11 @@ on:
         description: 'Vault server URL'
         required: true
         type: string
+      role_name:
+        description: 'Vault role name'
+        required: true
+        type: string
+        default: 'myproject-github-role'
 
 # Required for OIDC authentication
 permissions:
@@ -23,8 +28,8 @@ jobs:
         with:
           url: ${{ github.event.inputs.vault_addr }}
           method: jwt
-          role: myproject-github-role
-          jwtGithubAudience: https://github.com/songlining/github-action-vault-demo
+          role: ${{ github.event.inputs.role_name }}
+          jwtGithubAudience: https://github.com/${{ github.repository }}
           tlsSkipVerify: true
           secrets: |
             kv-v2/data/myapp username

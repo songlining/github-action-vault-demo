@@ -11,6 +11,22 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# Function to display usage
+usage() {
+    echo -e "${YELLOW}Usage: $0 [-a VAULT_URL] [-r ROLE_NAME] [-h]${NC}"
+    echo -e "${YELLOW}Options:${NC}"
+    echo -e "${YELLOW}  -a VAULT_URL    Specify Vault server URL${NC}"
+    echo -e "${YELLOW}  -r ROLE_NAME    Specify Vault role name${NC}"
+    echo -e "${YELLOW}  -h              Show this help message${NC}"
+    echo -e "${YELLOW}${NC}"
+    echo -e "${YELLOW}Environment Variables:${NC}"
+    echo -e "${YELLOW}  VAULT_ADDR      Vault server URL (takes precedence over -a flag)${NC}"
+    echo -e "${YELLOW}${NC}"
+    echo -e "${YELLOW}Examples:${NC}"
+    echo -e "${YELLOW}  $0 -a https://vault.example.com:8200 -r myproject-github-role${NC}"
+    echo -e "${YELLOW}  VAULT_ADDR=https://vault.example.com:8200 $0 -r production-role${NC}"
+}
+
 echo -e "${YELLOW}🚀 Triggering Vault Demo GitHub Action...${NC}"
 
 # Check if GitHub CLI is installed
@@ -27,18 +43,56 @@ if ! gh auth status &> /dev/null; then
     exit 1
 fi
 
+# Parse command line options
+VAULT_ADDR_FLAG=""
+ROLE_NAME_FLAG=""
+while getopts "a:r:h" opt; do
+    case $opt in
+        a)
+            VAULT_ADDR_FLAG="$OPTARG"
+            ;;
+        r)
+            ROLE_NAME_FLAG="$OPTARG"
+            ;;
+        h)
+            usage
+            exit 0
+            ;;
+        \?)
+            echo -e "${RED}❌ Invalid option: -$OPTARG${NC}" >&2
+            usage
+            exit 1
+            ;;
+        :)
+            echo -e "${RED}❌ Option -$OPTARG requires an argument.${NC}" >&2
+            usage
+            exit 1
+            ;;
+    esac
+done
+
 # Get VAULT_ADDR from environment variable or command line argument
 VAULT_ADDR_INPUT=""
 if [ ! -z "$VAULT_ADDR" ]; then
     echo -e "${GREEN}📍 Using VAULT_ADDR from environment variable: $VAULT_ADDR${NC}"
     VAULT_ADDR_INPUT="$VAULT_ADDR"
-elif [ ! -z "$1" ]; then
-    echo -e "${GREEN}📍 Using VAULT_ADDR from command line argument: $1${NC}"
-    VAULT_ADDR_INPUT="$1"
+elif [ ! -z "$VAULT_ADDR_FLAG" ]; then
+    echo -e "${GREEN}📍 Using VAULT_ADDR from command line argument: $VAULT_ADDR_FLAG${NC}"
+    VAULT_ADDR_INPUT="$VAULT_ADDR_FLAG"
 else
-    echo -e "${RED}❌ VAULT_ADDR not found in environment variable and no command line argument provided.${NC}"
-    echo -e "${YELLOW}Usage: $0 [VAULT_URL]${NC}"
-    echo -e "${YELLOW}Or set VAULT_ADDR environment variable${NC}"
+    echo -e "${RED}❌ VAULT_ADDR not found in environment variable and no -a flag provided.${NC}"
+    usage
+    exit 1
+fi
+
+# Get ROLE_NAME from command line argument (required)
+ROLE_NAME_INPUT=""
+if [ ! -z "$ROLE_NAME_FLAG" ]; then
+    echo -e "${GREEN}🎭 Using role name: $ROLE_NAME_FLAG${NC}"
+    ROLE_NAME_INPUT="$ROLE_NAME_FLAG"
+else
+    echo -e "${RED}❌ Role name not provided. Please use -r flag to specify the role name.${NC}"
+    usage
     exit 1
 fi
 
@@ -49,9 +103,11 @@ if [[ ! "$VAULT_ADDR_INPUT" =~ ^https?:// ]]; then
     exit 1
 fi
 
-# Trigger the workflow with VAULT_ADDR input
-echo -e "${YELLOW}Triggering workflow with VAULT_ADDR: $VAULT_ADDR_INPUT${NC}"
-if gh workflow run vault-demo.yaml --field vault_addr="$VAULT_ADDR_INPUT"; then
+# Trigger the workflow with VAULT_ADDR and ROLE_NAME inputs
+echo -e "${YELLOW}Triggering workflow with:${NC}"
+echo -e "${YELLOW}  VAULT_ADDR: $VAULT_ADDR_INPUT${NC}"
+echo -e "${YELLOW}  ROLE_NAME: $ROLE_NAME_INPUT${NC}"
+if gh workflow run vault-demo.yaml --field vault_addr="$VAULT_ADDR_INPUT" --field role_name="$ROLE_NAME_INPUT"; then
     echo -e "${GREEN}✅ Workflow triggered successfully!${NC}"
     
     # Wait for the run to appear
