@@ -19,7 +19,7 @@ jobs:
           url: ${{ secrets.VAULT_ADDR }}
           method: jwt
           role: myproject-github-role
-          audience: https://github.com/your-username/github-action-vault-demo
+          jwtGithubAudience: https://github.com/your-username/github-action-vault-demo
           tlsSkipVerify: true
           secrets: |
             kv-v2/data/myapp username
