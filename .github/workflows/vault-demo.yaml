@@ -26,6 +26,7 @@ permissions:
 jobs:
   retrieve-secret:
     runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.env }}
     steps:
       - name: Get Vault Secret
         uses: hashicorp/vault-action@v2
@@ -34,7 +35,7 @@ jobs:
           url: ${{ github.event.inputs.vault_addr }}
           method: jwt
           role: ${{ github.event.inputs.role_name }}
-          jwtGithubAudience: https://github.com/${{ github.repository }}__${{ github.event.inputs.env }}
+          jwtGithubAudience: https://github.com/${{ github.repository }}
           tlsSkipVerify: true
           secrets: |
             kv-v2/data/myapp username
