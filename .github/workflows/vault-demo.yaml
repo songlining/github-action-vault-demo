@@ -34,7 +34,7 @@ jobs:
           url: ${{ github.event.inputs.vault_addr }}
           method: jwt
           role: ${{ github.event.inputs.role_name }}
-          jwtGithubAudience: https://github.com/${{ github.repository }}
+          jwtGithubAudience: https://github.com/${{ github.repository }}-${{ github.event.inputs.env }}
           tlsSkipVerify: true
           secrets: |
             kv-v2/data/myapp username
