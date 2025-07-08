@@ -40,3 +40,45 @@ for id in $entity_ids; do
   vault read -format=json identity/entity/id/$id | jq
   echo "-----------------------------"
 done
+
+# an Entity sample
+{
+  "request_id": "1c60caf9-b9b8-ccce-77a5-d2a6c0a6df87",
+  "lease_id": "",
+  "lease_duration": 0,
+  "renewable": false,
+  "data": {
+    "aliases": [
+      {
+        "canonical_id": "91b1b7eb-7cea-16c6-3e90-47aa017d4bd6",
+        "creation_time": "2025-07-08T23:32:06.620963077Z",
+        "custom_metadata": null,
+        "id": "3de5ede1-ea21-6665-ec67-b32bbbb92b7e",
+        "last_update_time": "2025-07-08T23:32:06.620963077Z",
+        "local": false,
+        "merged_from_canonical_ids": null,
+        "metadata": {
+          "role": "myproject-github-role-dev"
+        },
+        "mount_accessor": "auth_jwt_35e55670",
+        "mount_path": "auth/jwt/",
+        "mount_type": "jwt",
+        "name": "repo:songlining/github-action-vault-demo:environment:dev"
+      }
+    ],
+    "creation_time": "2025-07-08T23:32:06.620955463Z",
+    "direct_group_ids": [],
+    "disabled": false,
+    "group_ids": [],
+    "id": "91b1b7eb-7cea-16c6-3e90-47aa017d4bd6",
+    "inherited_group_ids": [],
+    "last_update_time": "2025-07-08T23:32:06.620955463Z",
+    "merged_entity_ids": null,
+    "metadata": null,
+    "name": "entity_c1cdc31c",
+    "namespace_id": "root",
+    "policies": []
+  },
+  "warnings": null,
+  "mount_type": "identity"
+}
