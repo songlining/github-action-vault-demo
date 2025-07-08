@@ -26,7 +26,7 @@ permissions:
 jobs:
   retrieve-secret:
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.env }}
+    environment: ${{ github.event.inputs.env }} # this will be the jwt environment claim
     steps:
       - name: Get Vault Secret
         uses: hashicorp/vault-action@v2
