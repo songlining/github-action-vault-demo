@@ -15,7 +15,7 @@ path "kv-v2/data/myapp" {
 EOF
 
 # subject claim: "repo:songlining/github-action-vault-demo:environment:dev"
-vault write auth/jwt/role/myproject-github-role -<<EOF
+vault write auth/jwt/role/myproject-github-role-dev -<<EOF
 {
   "role_type": "jwt",
   "user_claim": "sub",
