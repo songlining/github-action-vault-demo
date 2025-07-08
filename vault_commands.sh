@@ -21,7 +21,7 @@ vault write auth/jwt/role/myproject-github-role -<<EOF
   "bound_audiences": ["https://github.com/songlining/github-action-vault-demo"],
   "bound_claims": {
     "repository": "songlining/github-action-vault-demo",
-    "environment": "de"
+    "environment": "dev"
   },
   "policies": ["myproject-policy"],
   "ttl": "10m"
