@@ -17,7 +17,7 @@ EOF
 vault write auth/jwt/role/myproject-github-role -<<EOF
 {
   "role_type": "jwt",
-  "user_claim": "aud",
+  "user_claim": "sub",  # "repo:songlining/github-action-vault-demo:environment:dev"
   "bound_audiences": ["https://github.com/songlining/github-action-vault-demo"],
   "bound_claims": {
     "repository": "songlining/github-action-vault-demo",
@@ -31,11 +31,11 @@ EOF
 #!/bin/bash
 
 # List all entity IDs
-alias_ids=$(vault list -format=json identity/entity/id | jq -r '.[]')
+entity_ids=$(vault list -format=json identity/entity/id | jq -r '.[]')
 
 # Loop through each alias ID and read its details
-for id in $alias_ids; do
-  echo "Reading entity alias ID: $id"
+for id in $entity_ids; do
+  echo "Reading entity ID: $id"
   vault read -format=json identity/entity/id/$id | jq
   echo "-----------------------------"
 done
