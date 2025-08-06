@@ -1,3 +1,5 @@
+# this file contains some commands I used to setup the env. 
+
 # 1. Enable JWT auth method
 vault auth enable jwt
 
